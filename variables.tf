@@ -1,279 +1,311 @@
-variable "create_lb" {
-  description = "Controls if the Load Balancer should be created"
+variable "create_bucket" {
+  description = "Controls if S3 bucket should be created"
   type        = bool
   default     = true
 }
 
-variable "drop_invalid_header_fields" {
-  description = "Indicates whether invalid header fields are dropped in application load balancers. Defaults to false."
+variable "attach_elb_log_delivery_policy" {
+  description = "Controls if S3 bucket should have ELB log delivery policy attached"
   type        = bool
   default     = false
 }
 
-variable "preserve_host_header" {
-  description = "Indicates whether Host header should be preserve and forward to targets without any change. Defaults to false."
+variable "attach_lb_log_delivery_policy" {
+  description = "Controls if S3 bucket should have ALB/NLB log delivery policy attached"
   type        = bool
   default     = false
 }
 
-variable "enable_deletion_protection" {
-  description = "If true, deletion of the load balancer will be disabled via the AWS API. This will prevent Terraform from deleting the load balancer. Defaults to false."
+variable "attach_access_log_delivery_policy" {
+  description = "Controls if S3 bucket should have S3 access log delivery policy attached"
   type        = bool
   default     = false
 }
 
-variable "enable_http2" {
-  description = "Indicates whether HTTP/2 is enabled in application load balancers."
+variable "attach_deny_insecure_transport_policy" {
+  description = "Controls if S3 bucket should have deny non-SSL transport policy attached"
+  type        = bool
+  default     = false
+}
+
+variable "attach_require_latest_tls_policy" {
+  description = "Controls if S3 bucket should require the latest version of TLS"
+  type        = bool
+  default     = false
+}
+
+variable "attach_policy" {
+  description = "Controls if S3 bucket should have bucket policy attached (set to `true` to use value of `policy` as bucket policy)"
+  type        = bool
+  default     = false
+}
+
+variable "attach_public_policy" {
+  description = "Controls if a user defined public bucket policy will be attached (set to `false` to allow upstream to apply defaults to the bucket)"
   type        = bool
   default     = true
 }
 
-variable "enable_cross_zone_load_balancing" {
-  description = "Indicates whether cross zone load balancing should be enabled in application load balancers."
+variable "attach_inventory_destination_policy" {
+  description = "Controls if S3 bucket should have bucket inventory destination policy attached."
   type        = bool
   default     = false
 }
 
-variable "enable_tls_version_and_cipher_suite_headers" {
-  description = "Indicates whether the two headers (x-amzn-tls-version and x-amzn-tls-cipher-suite), which contain information about the negotiated TLS version and cipher suite, are added to the client request before sending it to the target."
+variable "attach_analytics_destination_policy" {
+  description = "Controls if S3 bucket should have bucket analytics destination policy attached."
   type        = bool
   default     = false
 }
 
-variable "enable_xff_client_port" {
-  description = "Indicates whether the X-Forwarded-For header should preserve the source port that the client used to connect to the load balancer in application load balancers."
-  type        = bool
-  default     = true
-}
-
-variable "extra_ssl_certs" {
-  description = "A list of maps describing any extra SSL certificates to apply to the HTTPS listeners. Required key/values: certificate_arn, https_listener_index (the index of the listener within https_listeners which the cert applies toward)."
-  type        = list(map(string))
-  default     = []
-}
-
-variable "https_listeners" {
-  description = "A list of maps describing the HTTPS listeners for this ALB. Required key/values: port, certificate_arn. Optional key/values: ssl_policy (defaults to ELBSecurityPolicy-2016-08), target_group_index (defaults to https_listeners[count.index])"
-  type        = any
-  default     = []
-}
-
-variable "http_tcp_listeners" {
-  description = "A list of maps describing the HTTP listeners or TCP ports for this ALB. Required key/values: port, protocol. Optional key/values: target_group_index (defaults to http_tcp_listeners[count.index])"
-  type        = any
-  default     = []
-}
-
-variable "https_listener_rules" {
-  description = "A list of maps describing the Listener Rules for this ALB. Required key/values: actions, conditions. Optional key/values: priority, https_listener_index (default to https_listeners[count.index])"
-  type        = any
-  default     = []
-}
-
-variable "http_tcp_listener_rules" {
-  description = "A list of maps describing the Listener Rules for this ALB. Required key/values: actions, conditions. Optional key/values: priority, http_tcp_listener_index (default to http_tcp_listeners[count.index])"
-  type        = any
-  default     = []
-}
-
-variable "idle_timeout" {
-  description = "The time in seconds that the connection is allowed to be idle."
-  type        = number
-  default     = 60
-}
-
-variable "ip_address_type" {
-  description = "The type of IP addresses used by the subnets for your load balancer. The possible values are ipv4 and dualstack."
-  type        = string
-  default     = "ipv4"
-}
-
-variable "listener_ssl_policy_default" {
-  description = "The security policy if using HTTPS externally on the load balancer. [See](https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/elb-security-policy-table.html)."
-  type        = string
-  default     = "ELBSecurityPolicy-2016-08"
-}
-
-variable "internal" {
-  description = "Boolean determining if the load balancer is internal or externally facing."
+variable "attach_deny_incorrect_encryption_headers" {
+  description = "Controls if S3 bucket should deny incorrect encryption headers policy attached."
   type        = bool
   default     = false
 }
 
-variable "load_balancer_create_timeout" {
-  description = "Timeout value when creating the ALB."
-  type        = string
-  default     = "10m"
+variable "attach_deny_incorrect_kms_key_sse" {
+  description = "Controls if S3 bucket policy should deny usage of incorrect KMS key SSE."
+  type        = bool
+  default     = false
 }
 
-variable "load_balancer_delete_timeout" {
-  description = "Timeout value when deleting the ALB."
-  type        = string
-  default     = "10m"
-}
-
-variable "name" {
-  description = "The resource name and Name tag of the load balancer."
+variable "allowed_kms_key_arn" {
+  description = "The ARN of KMS key which should be allowed in PutObject"
   type        = string
   default     = null
 }
 
-variable "name_prefix" {
-  description = "The resource name prefix and Name tag of the load balancer. Cannot be longer than 6 characters"
+variable "attach_deny_unencrypted_object_uploads" {
+  description = "Controls if S3 bucket should deny unencrypted object uploads policy attached."
+  type        = bool
+  default     = false
+}
+
+variable "bucket" {
+  description = "(Optional, Forces new resource) The name of the bucket. If omitted, Terraform will assign a random, unique name."
   type        = string
   default     = null
 }
 
-variable "load_balancer_type" {
-  description = "The type of load balancer to create. Possible values are application or network."
+variable "bucket_prefix" {
+  description = "(Optional, Forces new resource) Creates a unique bucket name beginning with the specified prefix. Conflicts with bucket."
   type        = string
-  default     = "application"
-}
-
-variable "load_balancer_update_timeout" {
-  description = "Timeout value when updating the ALB."
-  type        = string
-  default     = "10m"
-}
-
-variable "access_logs" {
-  description = "Map containing access logging configuration for load balancer."
-  type        = map(string)
-  default     = {}
-}
-
-variable "subnets" {
-  description = "A list of subnets to associate with the load balancer. e.g. ['subnet-1a2b3c4d','subnet-1a2b3c4e','subnet-1a2b3c4f']"
-  type        = list(string)
   default     = null
 }
 
-variable "subnet_mapping" {
-  description = "A list of subnet mapping blocks describing subnets to attach to network load balancer"
-  type        = list(map(string))
-  default     = []
+variable "acl" {
+  description = "(Optional) The canned ACL to apply. Conflicts with `grant`"
+  type        = string
+  default     = null
+}
+
+variable "policy" {
+  description = "(Optional) A valid bucket policy JSON document. Note that if the policy document is not specific enough (but still valid), Terraform may view the policy as constantly changing in a terraform plan. In this case, please make sure you use the verbose/specific version of the policy. For more information about building AWS IAM policy documents with Terraform, see the AWS IAM Policy Document Guide."
+  type        = string
+  default     = null
 }
 
 variable "tags" {
-  description = "A map of tags to add to all resources"
+  description = "(Optional) A mapping of tags to assign to the bucket."
   type        = map(string)
   default     = {}
 }
 
-variable "lb_tags" {
-  description = "A map of tags to add to load balancer"
-  type        = map(string)
-  default     = {}
-}
-
-variable "target_group_tags" {
-  description = "A map of tags to add to all target groups"
-  type        = map(string)
-  default     = {}
-}
-
-variable "https_listener_rules_tags" {
-  description = "A map of tags to add to all https listener rules"
-  type        = map(string)
-  default     = {}
-}
-
-variable "http_tcp_listener_rules_tags" {
-  description = "A map of tags to add to all http listener rules"
-  type        = map(string)
-  default     = {}
-}
-
-variable "https_listeners_tags" {
-  description = "A map of tags to add to all https listeners"
-  type        = map(string)
-  default     = {}
-}
-
-variable "http_tcp_listeners_tags" {
-  description = "A map of tags to add to all http listeners"
-  type        = map(string)
-  default     = {}
-}
-
-variable "security_groups" {
-  description = "The security groups to attach to the load balancer. e.g. [\"sg-edcd9784\",\"sg-edcd9785\"]"
-  type        = list(string)
-  default     = []
-}
-
-variable "target_groups" {
-  description = "A list of maps containing key/value pairs that define the target groups to be created. Order of these maps is important and the index of these are to be referenced in listener definitions. Required key/values: name, backend_protocol, backend_port"
-  type        = any
-  default     = []
-}
-
-variable "vpc_id" {
-  description = "VPC id where the load balancer and other resources will be deployed."
-  type        = string
-  default     = null
-}
-
-variable "enable_waf_fail_open" {
-  description = "Indicates whether to route requests to targets if lb fails to forward the request to AWS WAF"
+variable "force_destroy" {
+  description = "(Optional, Default:false ) A boolean that indicates all objects should be deleted from the bucket so that the bucket can be destroyed without error. These objects are not recoverable."
   type        = bool
   default     = false
 }
 
-variable "desync_mitigation_mode" {
-  description = "Determines how the load balancer handles requests that might pose a security risk to an application due to HTTP desync."
-  type        = string
-  default     = "defensive"
-}
-
-variable "xff_header_processing_mode" {
-  description = "Determines how the load balancer modifies the X-Forwarded-For header in the HTTP request before sending the request to the target."
-  type        = string
-  default     = "append"
-}
-
-################################################################################
-# Security Group
-################################################################################
-
-variable "create_security_group" {
-  description = "Determines if a security group is created"
-  type        = bool
-  default     = true
-}
-
-variable "security_group_name" {
-  description = "Name to use on security group created"
+variable "acceleration_status" {
+  description = "(Optional) Sets the accelerate configuration of an existing bucket. Can be Enabled or Suspended."
   type        = string
   default     = null
 }
 
-variable "security_group_use_name_prefix" {
-  description = "Determines whether the security group name (`security_group_name`) is used as a prefix"
-  type        = bool
-  default     = true
-}
-
-variable "security_group_description" {
-  description = "Description of the security group created"
+variable "request_payer" {
+  description = "(Optional) Specifies who should bear the cost of Amazon S3 data transfer. Can be either BucketOwner or Requester. By default, the owner of the S3 bucket would incur the costs of any data transfer. See Requester Pays Buckets developer guide for more information."
   type        = string
   default     = null
 }
 
-variable "security_group_rules" {
-  description = "Security group rules to add to the security group created"
-  type        = any
+variable "website" {
+  description = "Map containing static web-site hosting or redirect configuration."
+  type        = any # map(string)
   default     = {}
 }
 
-variable "security_group_tags" {
-  description = "A map of additional tags to add to the security group created"
+variable "cors_rule" {
+  description = "List of maps containing rules for Cross-Origin Resource Sharing."
+  type        = any
+  default     = []
+}
+
+variable "versioning" {
+  description = "Map containing versioning configuration."
   type        = map(string)
   default     = {}
 }
 
-variable "web_acl_arn" {
-  description = "WAF ARN to associate this LB with."
+variable "logging" {
+  description = "Map containing access bucket logging configuration."
+  type        = map(string)
+  default     = {}
+}
+
+variable "access_log_delivery_policy_source_buckets" {
+  description = "(Optional) List of S3 bucket ARNs wich should be allowed to deliver access logs to this bucket."
+  type        = list(string)
+  default     = []
+}
+
+variable "access_log_delivery_policy_source_accounts" {
+  description = "(Optional) List of AWS Account IDs should be allowed to deliver access logs to this bucket."
+  type        = list(string)
+  default     = []
+}
+
+variable "grant" {
+  description = "An ACL policy grant. Conflicts with `acl`"
+  type        = any
+  default     = []
+}
+
+variable "owner" {
+  description = "Bucket owner's display name and ID. Conflicts with `acl`"
+  type        = map(string)
+  default     = {}
+}
+
+variable "expected_bucket_owner" {
+  description = "The account ID of the expected bucket owner"
   type        = string
   default     = null
+}
+
+variable "lifecycle_rule" {
+  description = "List of maps containing configuration of object lifecycle management."
+  type        = any
+  default     = []
+}
+
+variable "replication_configuration" {
+  description = "Map containing cross-region replication configuration."
+  type        = any
+  default     = {}
+}
+
+variable "server_side_encryption_configuration" {
+  description = "Map containing server-side encryption configuration."
+  type        = any
+  default     = {}
+}
+
+variable "intelligent_tiering" {
+  description = "Map containing intelligent tiering configuration."
+  type        = any
+  default     = {}
+}
+
+variable "object_lock_configuration" {
+  description = "Map containing S3 object locking configuration."
+  type        = any
+  default     = {}
+}
+
+variable "metric_configuration" {
+  description = "Map containing bucket metric configuration."
+  type        = any
+  default     = []
+}
+
+variable "inventory_configuration" {
+  description = "Map containing S3 inventory configuration."
+  type        = any
+  default     = {}
+}
+
+variable "inventory_source_account_id" {
+  description = "The inventory source account id."
+  type        = string
+  default     = null
+}
+
+variable "inventory_source_bucket_arn" {
+  description = "The inventory source bucket ARN."
+  type        = string
+  default     = null
+}
+
+variable "inventory_self_source_destination" {
+  description = "Whether or not the inventory source bucket is also the destination bucket."
+  type        = bool
+  default     = false
+}
+
+variable "analytics_configuration" {
+  description = "Map containing bucket analytics configuration."
+  type        = any
+  default     = {}
+}
+
+variable "analytics_source_account_id" {
+  description = "The analytics source account id."
+  type        = string
+  default     = null
+}
+
+variable "analytics_source_bucket_arn" {
+  description = "The analytics source bucket ARN."
+  type        = string
+  default     = null
+}
+
+variable "analytics_self_source_destination" {
+  description = "Whether or not the analytics source bucket is also the destination bucket."
+  type        = bool
+  default     = false
+}
+
+variable "object_lock_enabled" {
+  description = "Whether S3 bucket should have an Object Lock configuration enabled."
+  type        = bool
+  default     = false
+}
+
+variable "block_public_acls" {
+  description = "Whether Amazon S3 should block public ACLs for this bucket."
+  type        = bool
+  default     = true
+}
+
+variable "block_public_policy" {
+  description = "Whether Amazon S3 should block public bucket policies for this bucket."
+  type        = bool
+  default     = true
+}
+
+variable "ignore_public_acls" {
+  description = "Whether Amazon S3 should ignore public ACLs for this bucket."
+  type        = bool
+  default     = true
+}
+
+variable "restrict_public_buckets" {
+  description = "Whether Amazon S3 should restrict public bucket policies for this bucket."
+  type        = bool
+  default     = true
+}
+
+variable "control_object_ownership" {
+  description = "Whether to manage S3 Bucket Ownership Controls on this bucket."
+  type        = bool
+  default     = false
+}
+
+variable "object_ownership" {
+  description = "Object ownership. Valid values: BucketOwnerEnforced, BucketOwnerPreferred or ObjectWriter. 'BucketOwnerEnforced': ACLs are disabled, and the bucket owner automatically owns and has full control over every object in the bucket. 'BucketOwnerPreferred': Objects uploaded to the bucket change ownership to the bucket owner if the objects are uploaded with the bucket-owner-full-control canned ACL. 'ObjectWriter': The uploading account will own the object if the object is uploaded with the bucket-owner-full-control canned ACL."
+  type        = string
+  default     = "BucketOwnerEnforced"
 }
